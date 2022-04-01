@@ -3,14 +3,18 @@ import { getJSON } from './helpers.js';
 
 export const state = {
     recipe: {},
+    search: {
+        query: '',
+        results: []
+    }
 };
 
 export const loadRecipe = async function(id) {
     try {
-        const data = await getJSON(`${API_URL}/${id}`);
-        // console.log(response, data);
+        const data = await getJSON(`${API_URL}${id}`);
+        // console.log(data);
 
-        const {recipe} = data.data;
+        const { recipe } = data.data;
         state.recipe = {
             id: recipe.id,
             title: recipe.title,
@@ -24,7 +28,28 @@ export const loadRecipe = async function(id) {
         console.log(state.recipe);
     } catch (err) {
         // alert(err);
-        // console.error(`${err} !!!`); // temp error handling
+        console.error(`${err} !`); // temp error handling
         throw err;
+    }
+}
+
+export const loadSearchResult = async function(query) {
+    try {
+        state.search.query = query;
+
+        const data = await getJSON(`${API_URL}?search=${query}`);
+        console.log(data);
+
+        state.search.results = data.data.recipes.map(rec => {
+            return {
+                id: rec.id,
+                title: rec.title,
+                publisher: rec.publisher,
+                image: rec.image_url
+            }
+        });
+    } catch (err) {
+        console.error(`${err} !`); // temp error handling
+        // throw err;
     }
 }
